@@ -1,4 +1,4 @@
-# SQL note
+# ADO.NET note
 
 NhanNguyen
 
