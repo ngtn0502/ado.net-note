@@ -13,6 +13,7 @@ some little note by myself to remind what did i learn
 |     |                                           |
 | 1   | [Basic](#basic) |
 | 2   | [Connection string](#connection-string) |
+| 3   | [SqlCommand Class](#sqlcommand-class) |
 
 # Basic
 
@@ -102,5 +103,50 @@ All configuaration and this related thing is stored in system.configuaration nam
             connection.Open();
             GridView1.DataSource = cmd.ExecuteReader();
             GridView1.DataBind();
+        }
+    }
+
+
+# Sqlcommand class
+
+SqlCommand class is used to prepare an SQL statement or StoredProcedure that we want to execute on a SQL Server database.
+
+The following are the most commonly used methods of the SqlCommand class.
+
+    ExecuteReader - Use when the T-SQL statement returns more than a single value. For example, if the query returns rows of data.
+    ExecuteNonQuery - Use when you want to perform an Insert, Update or Delete operation
+    ExecuteScalar - Use when the query returns a single(scalar) value. For example, queries that return the total number of rows in a table.
+
+
+The following example performs an Insert, Update and Delete operations on a SQL server database using the ExecuteNonQuery() method of the SqlCommand object.
+
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        string ConnectionString = ConfigurationManager.ConnectionStrings["DatabaseConnectionString"].ConnectionString;
+        using (SqlConnection connection = new SqlConnection("data source=.; database=Sample_Test_DB; integrated security=SSPI"))
+        {
+            //Create an instance of SqlCommand class, specifying the T-SQL command
+            //that we want to execute, and the connection object.
+            SqlCommand cmd = new SqlCommand("insert into tblProductInventory values (103, 'Apple Laptops', 100)", connection);
+            connection.Open();
+            //Since we are performing an insert operation, use ExecuteNonQuery()
+            //method of the command object. ExecuteNonQuery() method returns an
+            //integer, which specifies the number of rows inserted
+            int rowsAffected = cmd.ExecuteNonQuery();
+            Response.Write("Inserted Rows = " + rowsAffected.ToString() + "<br/>");
+
+            //Set to CommandText to the update query. We are reusing the command object,
+            //instead of creating a new command object
+            cmd.CommandText = "update tblProductInventory set QuantityAvailable = 101 where Id = 101";
+            //use ExecuteNonQuery() method to execute the update statement on the database
+            rowsAffected = cmd.ExecuteNonQuery();
+            Response.Write("Updated Rows = " + rowsAffected.ToString() + "<br/>");
+
+            //Set to CommandText to the delete query. We are reusing the command object,
+            //instead of creating a new command object
+            cmd.CommandText = "Delete from tblProductInventory where Id = 102";
+            //use ExecuteNonQuery() method to delete the row from the database
+            rowsAffected = cmd.ExecuteNonQuery();
+            Response.Write("Deleted Rows = " + rowsAffected.ToString() + "<br/>");
         }
     }
